@@ -5,13 +5,7 @@ from loaders import load_document, chunk_text
 from classifier import classify_chunk
 
 def _normalize_classify_output(result: Any) -> dict:
-    """
-    Accepts:
-      - dict (already parsed)
-      - JSON string (model returned stringified JSON)
-      - object with .content (some LLM wrappers)
-    Returns a normalized dict.
-    """
+
     # already a dict
     if isinstance(result, dict):
         return result

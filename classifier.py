@@ -1,16 +1,12 @@
-# classifier.py
 import re
 import json
 import time
 from typing import Dict, Any
 
-# Use the updated Ollama integration
 from langchain_ollama import OllamaLLM
 
-# initialize the local model (change model name if you pulled a different one)
 llm = OllamaLLM(model="llama3.1", temperature=0.1, max_tokens=512)
 
-# --- Prompt template (strict JSON-only output) ---
 PROMPT_TEMPLATE = """
 You are an MNPI (Material Non‑Public Information) detection classifier.
 Read the following text CHUNK and decide whether it contains MNPI according to the strict definition below.
@@ -46,9 +42,7 @@ Now analyze the chunk below.
 --- CHUNK END ---
 """
 
-# --- Safe JSON extraction + normalization (same logic from the prompt guidance) ---
 def safe_parse_model_output(response_text: str) -> Dict[str, Any]:
-    # Extract first JSON-looking substring to be robust
     m = re.search(r"\{.*\}", response_text, flags=re.DOTALL)
     if not m:
         return {

@@ -3,13 +3,7 @@
 from typing import List, Dict, Any
 
 def aggregate_results(results: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Normalizes classifier outputs and produces an overall summary.
-    Expects each result to contain keys like:
-      - mnpi: "yes" | "no" | "unclear"
-      - categories: list of strings (may be missing)
-      - confidence: float (may be missing)
-    """
+
     # Defensive normalization
     normalized = []
     for r in results:
