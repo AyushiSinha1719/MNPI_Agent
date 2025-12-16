@@ -1,4 +1,3 @@
-# streamlit_app.py
 import streamlit as st
 import hashlib
 import io
@@ -7,17 +6,13 @@ import re
 import time
 from typing import List, Dict, Any
 
-# Import your classifier function (adjust import path if needed)
-# classifier.classify_chunk should return a normalized dict as we defined earlier
 from classifier import classify_chunk
 
-# Document loaders (reuse your loader logic)
 from pypdf import PdfReader
 import docx2txt
 
 st.set_page_config(page_title="MNPI Detector — Demo", layout="wide")
 
-# ---------- Utility helpers ----------
 def load_document_bytes(uploaded_file) -> str:
     name = uploaded_file.name.lower()
     if name.endswith(".pdf"):
@@ -25,7 +20,6 @@ def load_document_bytes(uploaded_file) -> str:
         pages = [p.extract_text() or "" for p in reader.pages]
         return "\n".join(pages)
     elif name.endswith(".docx"):
-        # docx2txt expects a path or file, so we write to bytesIO then to temp file
         with open("._temp_upload.docx", "wb") as f:
             f.write(uploaded_file.getbuffer())
         return docx2txt.process("._temp_upload.docx")
@@ -35,22 +29,17 @@ def load_document_bytes(uploaded_file) -> str:
 def sha256_of_text(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
-# Redact numbers, dollar amounts, dates to avoid verbatim leakage
 def redact_sensitive_tokens(s: str) -> str:
     if not isinstance(s, str):
         return s
-    # redact dollar amounts and number groups
     s = re.sub(r'\$\s?[\d\.,]+', '[REDACTED]', s)
     s = re.sub(r'\b\d{1,3}(?:,\d{3})*(?:\.\d+)?\b', '[REDACTED]', s)
-    # redact ISO-like dates and common date patterns
     s = re.sub(r'\b\d{4}-\d{2}-\d{2}\b', '[REDACTED]', s)
     s = re.sub(r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\b \d{1,2}, \d{4}', '[REDACTED]', s, flags=re.IGNORECASE)
-    # keep length reasonable
     if len(s) > 240:
         s = s[:237] + "..."
     return s
 
-# Render a styled card for a result (uses safe HTML; Streamlit allows unsafe because user supplied content is sanitized)
 def render_result_card(chunk_hash: str, idx: int, res: Dict[str, Any]):
     categories = ", ".join(res.get("categories", []))
     evidence = redact_sensitive_tokens(res.get("evidence_summary", ""))
@@ -84,7 +73,6 @@ def render_result_card(chunk_hash: str, idx: int, res: Dict[str, Any]):
     st.markdown(html, unsafe_allow_html=True)
 
 
-# ---------- Streamlit UI ----------
 st.title("🔎 MNPI Detector")
 st.sidebar.header("Options & Safety")
 
@@ -104,13 +92,10 @@ if uploaded is not None:
     st.info(f"File uploaded: {uploaded.name}. Processing will NOT show raw content.")
     text = load_document_bytes(uploaded)
 
-    # chunking: simple split by paragraphs to avoid extra dependency in UI
-    # you should replace with your robust chunk_text() from earlier
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
-    # combine paragraphs into approx N token chunks (simple heuristic by characters)
     chunks: List[str] = []
     current = ""
-    max_chars = 3000  # adjust as desired
+    max_chars = 3000  
     for p in paragraphs:
         if len(current) + len(p) + 1 > max_chars:
             chunks.append(current)
@@ -122,29 +107,22 @@ if uploaded is not None:
 
     st.write(f"Document split into **{len(chunks)}** chunks (no raw text shown).")
 
-    # UI progress
     status = st.empty()
     results: List[Dict[str, Any]] = []
     progress = st.progress(0)
 
-    # Warm-up: optional (if your classifier uses local model, warm-up occurs inside classifier module)
     try:
-        # Try a zero-length warmup when classifier provides warmup (skip if not)
         pass
     except Exception:
         pass
 
-    # Iterate chunks
     for i, chunk in enumerate(chunks, start=1):
         status.text(f"Analyzing chunk {i}/{len(chunks)}...")
-        # compute chunk hash (don't display raw chunk)
         chunk_hash = sha256_of_text(chunk)
-        # call classifier: expected to return dict (normalized)
         start = time.time()
         res = classify_chunk(chunk)
         elapsed = time.time() - start
 
-        # enforce redaction on evidence_summary here too for extra safety
         res["evidence_summary"] = redact_sensitive_tokens(res.get("evidence_summary", ""))
         res["chunk_hash"] = chunk_hash
         res["chunk_index"] = i
@@ -152,7 +130,6 @@ if uploaded is not None:
 
         results.append(res)
 
-        # render the card
         render_result_card(chunk_hash, i, res)
 
         progress.progress(int(i / len(chunks) * 100))
@@ -160,7 +137,6 @@ if uploaded is not None:
     status.text("Analysis complete.")
     progress.empty()
 
-    # Show sanitized table and download
     st.markdown("### Sanitized Results (no raw text)")
     simple_rows = []
     for r in results:
@@ -175,7 +151,6 @@ if uploaded is not None:
         })
     st.table(simple_rows)
 
-    # prepare JSON/CSV download (sanitized)
     safe_report = {
         "document_name": uploaded.name,
         "timestamp": time.time(),
