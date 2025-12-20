@@ -3,3 +3,5 @@ langchain-openai
 pypdf
 docx2txt
 python-dotenv
+streamlit
+langchain-ollama
