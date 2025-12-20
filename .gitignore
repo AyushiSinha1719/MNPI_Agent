@@ -1,6 +1,13 @@
-sample_docs/
+# Python
 __pycache__/
-*.pyc 
-*.docx
-*.pdf
+*.pyc
 .env
+.venv/
+
+# Node / general
+node_modules/
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
