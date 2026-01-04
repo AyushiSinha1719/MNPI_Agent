@@ -2,6 +2,10 @@
 
 An AI-powered agent that automatically detects **Material Non-Public Information (MNPI)** in documents to help organizations maintain regulatory compliance and prevent insider trading risks.
 
+## 🌐 Live Demo
+
+**Try it now:** [https://mnpi-agent.streamlit.app/](https://mnpi-agent.streamlit.app/)
+
 ## 📋 Overview
 
 The MNPI Detector analyzes documents (PDF, DOCX, TXT) to identify sensitive information that could affect securities trading decisions. It uses a local Large Language Model (LLaMA 3.1 via Ollama) to classify content chunks based on strict MNPI definitions, ensuring privacy and data security by processing everything locally.
@@ -112,6 +116,28 @@ python app.py
    - Display results with confidence scores and risk levels
    - Provide redacted evidence summaries
 4. Review the results and download the sanitized JSON report
+
+## 📸 Screenshots
+
+### Home Page
+Upload your document to get started with MNPI detection.
+
+![Home Page](Screenshot/image.png)
+
+### Document Processing
+The app chunks your document and analyzes each section for MNPI content.
+
+![Chunking Process](Screenshot/home_page.png)
+
+### Analysis Results
+View detailed MNPI classification results with confidence scores and risk levels.
+
+![Results](Screenshot/result.png)
+
+### Export Report
+Download a sanitized JSON report for compliance records.
+
+![JSON Export](Screenshot/json.png)
 
 ### Understanding the Results:
 
