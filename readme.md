@@ -6,6 +6,8 @@ An AI-powered agent that automatically detects **Material Non-Public Information
 
 **Try it now:** [https://mnpi-agent.streamlit.app/](https://mnpi-agent.streamlit.app/)
 
+> **⚠️ Note:** The live demo currently uses **Ollama (local LLM)** which cannot process documents on Streamlit Cloud since Ollama runs locally. To enable document processing in the deployed version, the app needs to be modified to use **OpenAI GPT API** instead. For full functionality, please run the app locally following the setup instructions below.
+
 ## 📋 Overview
 
 The MNPI Detector analyzes documents (PDF, DOCX, TXT) to identify sensitive information that could affect securities trading decisions. It uses a local Large Language Model (LLaMA 3.1 via Ollama) to classify content chunks based on strict MNPI definitions, ensuring privacy and data security by processing everything locally.
